@@ -36,19 +36,39 @@ class Job{
 	}
 
 	int releaseDevice(int num){
-		if(currentDevices-num < 0) currentDevices = 0;
-		else currentDevices -= num;
+		int down;
+		if(currentDevices-num < 0){
+			down = currentDevices;
+			currentDevices = 0;
+		}
+		else{
+			currentDevices -= num;
+			down = num;
+		}
+		return down;
 	}
 
-	void addDevice(int num){
+	int addDevice(int num){
+		int up;
 		if(currentDevices+num > maxDevices){
-			int up = 
+			up = maxDevices - currentDevices;
 			currentDevices = maxDevices;
-		else currentDevices += num;
+		}
+		else{
+			currentDevices += num;
+			up = num;
+		}
+		return up;
 
 	}
 
-	int requestDevice(int num){
-		
+	void requestDevice(int num){
+		int req;
+		if(num + currentRequest > maxDevices - currentDevices){
+			currentRequest = maxDevices -(currentDevices);
+		}
+		else{
+			currentRequest +=num;
+		}
 	}
 }
