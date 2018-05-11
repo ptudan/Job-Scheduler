@@ -14,6 +14,7 @@ public:
 	int requestDevice(int num);
 
 private:
+	int currentRequest;
 	int arrivalTime;
 	int completionTime;
 	int ID;
