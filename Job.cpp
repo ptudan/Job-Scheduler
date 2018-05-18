@@ -35,6 +35,10 @@ class Job{
 		else progress+=quantam;
 	}
 
+	int getMemoryNeed(){
+		return memoryNeed;
+	}
+
 	int releaseDevice(int num){
 		int down;
 		if(currentDevices-num < 0){

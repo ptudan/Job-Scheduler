@@ -1,7 +1,24 @@
 //Paul Tudan and Jefferson Kappers
 //5-11-18
 
+#include <Job.h>
+#include <list>
+#include <string>
+using namespace std;
+
+
 class Controller {
+private:
+    list<Job> SJFHoldQueue;
+    list<Job> FIFOHoldQueue;
+    list<Job> readyQueue;
+    list<Job> waitQueue;
+    int currentTime;
+    int maxMemory;
+    int freeMemory;
+    int numberOfSerialDevices;
+    int quantumTime;
+
 	void readInputFile() {
         string testOutputSting
         ofstream inputFile;
@@ -20,5 +37,23 @@ class Controller {
         else {
             cout << "Unable to open file";
         }
-    }	
+    }
+
+    void processNewJob(Job newJob){
+        if(newJob.getMemoryNeed() < freeMemory) insertReadyQueue(newJob);
+
+    }
+
+    void insertReadyQueue(Job newJob){
+        if(newJob.getMemoryNeed() > freeMemory) cout << "not enough mem to insert job into RQ";
+        else freeMemory - newJob.getMemoryNeed();
+
+        
+
+
+    }
+
+
+
+
 }

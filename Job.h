@@ -12,6 +12,7 @@ public:
 	void releaseDevice(int num);
 	void addDevice(int num);
 	int requestDevice(int num);
+	int getMemoryNeed();
 
 private:
 	int currentRequest;
