@@ -6,7 +6,7 @@ using namespace std;
 
 class Job{
 public:
-	void initiate(int arrivalTime, int ID, int memoryNeed, int maxDevices, int priority, int duration);
+	void initiate(int arrivalTime, int ID, int memoryNeed, int maxDevices, int priority, int length);
 	String currentStatus();
 	void quantamStep(int quantam);
 	void releaseDevice(int num);
@@ -23,7 +23,7 @@ private:
 	int maxDevices;
 	int currentDevices;
 	int priority;
-	int duration;
+	int length;
 	int progress;
 
 }

@@ -11,13 +11,15 @@ class Controler {
 public:
 	void readInputFile();
 private:
-	list<Job> SJFHoldQueue;
-	list<Job> FIFOHoldQueue;
+	list<Job> SJFQueue;
+	list<Job> FIFOQueue;
 	list<Job> readyQueue;
 	list<Job> waitQueue;
     int currentTime;
     int maxMemory;
     int freeMemory
-    int numberOfSerialDevices;
+    int maxDevices;
+    int freeDevices;
     int quantumTime;
+    list<Job>::iterator it;
 }

@@ -14,16 +14,19 @@ class Job{
 	int currentDevices;
 	int currentRequest;
 	int priority;
-	int duration;
+	int length;
 	int progress;
 
-	void initiate(int arrivalTime, int ID, int memoryNeed, int maxDevices, int priority, int duration){
+	void initiate(int arrivalTime, int ID, int memoryNeed, int maxDevices, int priority, int length){
 		this->arrivalTime = arrivalTime;
 		this->ID  = ID;
 		this->memoryNeed = memoryNeed;
 		this->maxDevices = maxDevices;
 		this->priority = priority;
-		this->duration = duration;
+		this->length = length;
+		currentRequest = 0;
+		currentDevices = 0;
+		progress = 0;
 	}
 
 	String currentStatus(){
@@ -31,12 +34,24 @@ class Job{
 	}
 
 	void quantamStep(int quantam){
-		if(progress+quantam>duration) progress = duration;
+		if(progress+quantam>length) progress = length;
 		else progress+=quantam;
 	}
 
 	int getMemoryNeed(){
 		return memoryNeed;
+	}
+
+	int getLength(){
+		return length;
+	}
+
+	int getMaxDevices(){
+		return maxDevices;
+	}
+
+	int getCurrentRequest(){
+		return currentRequest;
 	}
 
 	int releaseDevice(int num){
