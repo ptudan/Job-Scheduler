@@ -33,10 +33,21 @@ class Job{
 
 	}
 
-	void quantamStep(int quantam){
-		if(progress+quantam>length) progress = length;
-		else progress+=quantam;
+	bool isComplete(){
+		return progress >= length;
 	}
+
+	int step(int quantam){
+		if(progress+quantam>length){
+			int ret = length - progress;
+			progress = length;
+			return ret;
+		}
+		else progress+=quantam;
+		return quantam;
+	}
+
+
 
 	int getMemoryNeed(){
 		return memoryNeed;
@@ -48,6 +59,10 @@ class Job{
 
 	int getMaxDevices(){
 		return maxDevices;
+	}
+
+	int getCurrentDevices(){
+		return currentDevices;
 	}
 
 	int getCurrentRequest(){

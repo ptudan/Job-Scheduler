@@ -8,7 +8,7 @@ class Job{
 public:
 	void initiate(int arrivalTime, int ID, int memoryNeed, int maxDevices, int priority, int length);
 	String currentStatus();
-	void quantamStep(int quantam);
+	void step(int quantam);
 	void releaseDevice(int num);
 	void addDevice(int num);
 	int requestDevice(int num);

@@ -20,6 +20,7 @@ private:
     int maxDevices;
     int freeDevices;
     int quantumTime;
+    int nextRequest;
 
 	void readInputFile() {
         string testOutputSting
@@ -41,10 +42,58 @@ private:
         }
     }
 
-    void processNewJob(Job newJob){
-        if(newJob.getMemoryNeed() > maxMemory) cout << "Job exceeds maximum memory capacity\n";
-        else if(newJob.getMaxDevices() > maxDevices) cout << "Job exceeds maximum device capacity\n";
-        else if(newJob.getMemoryNeed() < freeMemory) insertReadyQueue(newJob);
+    int checkForRequest(endQuantam){
+        //TODO
+        //return an int for the number of requested devices
+        //for release it could be a negative number
+        //one function for update instead of release and requrest?
+    }
+
+    void processLineOfInput(){
+        //call the functions basically
+        //update the nextRequest variable so that you can do quantams
+    }
+
+    void quantamStep(){
+        int endQuantam = currentTime + quantam;
+        if(nextRequest>endQuantam){//no requests to process this quantam
+            if(readyQueue.empty()){
+                currentTime += quantam;
+                return;
+            }
+            Job currentJob = readyQueue.front();
+            currentTime += currentJob.step(quantam);
+            if(currentJob.isComplete()){
+                completeJob();
+            }
+
+        }
+
+
+
+    }
+
+    void completeJob(){
+        //do we need completed queue for logs?
+        Job completingJob = readyQueue.front();
+        freeMemory += completingJob.getMemoryNeed();
+        freeDevices += completingJob.getCurrentDevices();
+
+    }
+
+    void checkQueues(){
+        //wait queue has a list of devices sorted in ascending order 
+        //of currentDevicesRequested
+
+    }
+
+    void 
+
+    void processNewJob(Job *newJob){
+        if(*newJob.getMemoryNeed() > maxMemory) cout << "Job exceeds maximum memory capacity\n";
+        else if(*newJob.getMaxDevices() > maxDevices) cout << "Job exceeds maximum device capacity\n";
+        else if(*newJob.getMemoryNeed() < freeMemory) insertReadyQueue(*newJob);
+        else if( )
 
     }
 
