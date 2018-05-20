@@ -29,11 +29,46 @@ private:
         if (inputFile.is_open()) {
             while (!inputFile.eof) {
                 getline(inputFile,oneLineString);
-                cout<<oneLineString;
-                for (i = 0; i <= oneLineString.size(); i++) {
-                    if (oneLineString[i] == ) {
+                cout<<oneLineString<<endl;
+                if (oneLineString.first == 'C') {
+                    //initiate system with the following configuration from oneLineString:
 
-                    }
+                    //start time
+                    currentTime = (int)oneLineString[2];
+
+                    //main memory capacity and current free memory capacity
+                    maxMemory = (int)oneLineString[7];
+                    freeMemory = (int)oneLineString[7];
+
+                    //number of serial devices
+                    maxDevices = (int)oneLineString[11];
+                    freeDevices = (int)oneLineString[11];
+
+                    //quantum time
+                    quantumTime = (int)oneLineString.last;
+
+                }
+                else if (oneLineString.first == 'A') {
+                    //job intialization with these spesifications:
+                    //int arrivalTime, int ID, int memoryNeed, int maxDevices, int priority, int length
+                    Job newJob((int)oneLineString[3], (int)oneLineString[7], (int)oneLineString[11], (int)oneLineString[15], (int)oneLineString[19], (int)oneLineString[23]);
+                }
+                else if (oneLineString.first == 'Q') {
+                    //request for device(s) from job specified in oneLineString
+                    currentTime = (int)oneLineString[3];
+                    //find job with id == (int)oneLineString[7];
+                    //change the job's number of currently used devices like:
+                    //jobWithID.addDevice((int)oneLineString[11]);
+                    freeDevices -= oneLineString[11];
+                }
+                else if (oneLineString.first == 'L') {
+                    //release device(s) from job specified in oneLineString
+                }
+                else if (oneLineString.first == 'D') {
+                    //display system status
+                }
+                else {
+                    cout<<"Job category not found for: ", oneLineString<<endl;
                 }
             }
         }
