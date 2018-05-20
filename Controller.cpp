@@ -28,74 +28,9 @@ private:
         inputFile.open('input.txt');
         if (inputFile.is_open()) {
             while (!inputFile.eof) {
-                getline(inputFile,oneLineString);
-                cout<<oneLineString<<endl;
-                if (oneLineString.first == 'C') {
-                    //initiate system with the following configuration from oneLineString:
-
-                    //start time
-                    currentTime = (int)oneLineString[2];
-
-                    //main memory capacity and current free memory capacity
-                    maxMemory = (int)oneLineString[7];
-                    freeMemory = (int)oneLineString[7];
-
-                    //number of serial devices
-                    maxDevices = (int)oneLineString[11];
-                    freeDevices = (int)oneLineString[11];
-
-                    //quantum time
-                    quantumTime = (int)oneLineString.last;
-
-                }
-                else if (oneLineString.first == 'A') {
-                    //job intialization with these spesifications:
-                    //int arrivalTime, int ID, int memoryNeed, int maxDevices, int priority, int length
-                    Job newJob((int)oneLineString[3], (int)oneLineString[7], (int)oneLineString[11], (int)oneLineString[15], (int)oneLineString[19], (int)oneLineString[23]);
-                    processNewJob(newJob);
-                }
-                else if (oneLineString.first == 'Q') {
-                    //request for device(s) from job specified in oneLineString
-                    currentTime = (int)oneLineString[3];
-                    //find job with id == (int)oneLineString[7];
-                    //change the job's number of currently used devices like:
-                    //jobWithID.addDevice((int)oneLineString[11]);
-                    freeDevices -= oneLineString[11];
-                }
-                else if (oneLineString.first == 'L') {
-                    //release device(s) from job specified in oneLineString
-                    currentTime = (int)oneLineString[3];
-                    //find job with id == (int)oneLineString[7];
-                    //change the job's number of currently used devices like:
-                    //jobWithID.releaseDevice((int)oneLineString[11]);
-                    freeDevices += oneLineString[11];
-                }
-                else if (oneLineString.first == 'D') {
-                    int waitFor = (int)oneLineString[3];
-                    if (waitFor == 9999) {
-                        //display the system turnaround and weighted turnaround time
-                        cout<<""<<endl;
-                    }
-                    else if (currentTime == waitFor) {
-                        //display system status
-                        cout<<"The system currently looks like this:"<<endl;
-                        //list of each job
-                        cout<<""<<endl;
-                        //the remaining service time for unfinished jobs
-                        cout<<""<<endl;
-                        //the turnaround and weighted turnaround time for each finished job
-                        cout<<""<<endl;
-                        //the current contents of each of the queues
-                        cout<<""<<endl;
-                    }
-                    else {
-                        cout<<"How'd we get here?"<<endl;
-                        cout<<"waitFor value: ", waitFor<<endl;
-                    }
-                }
-                else {
-                    cout<<"Job category not found for: ", oneLineString<<endl;
-                }
+                getline(inputFile, oneLineString);
+                cout<<"Single line input: "oneLineString<<endl;
+                processLineOfInput(string oneLineString);
             }
         }
         else {
@@ -110,9 +45,75 @@ private:
         //one function for update instead of release and requrest?
     }
 
-    void processLineOfInput(){
+    void processLineOfInput(string inputLine){
         //call the functions basically
         //update the nextRequest variable so that you can do quantams
+        if (inputLine.first == 'C') {
+            //initiate system with the following configuration from inputLine:
+
+            //start time
+            currentTime = (int)inputLine[2];
+
+            //main memory capacity and current free memory capacity
+            maxMemory = (int)inputLine[7];
+            freeMemory = (int)inputLine[7];
+
+            //number of serial devices
+            maxDevices = (int)inputLine[11];
+            freeDevices = (int)inputLine[11];
+
+            //quantum time
+            quantumTime = (int)inputLine.last;
+
+        }
+        else if (inputLine.first == 'A') {
+            //job intialization with these spesifications:
+            //int arrivalTime, int ID, int memoryNeed, int maxDevices, int priority, int length
+            Job newJob((int)inputLine[3], (int)inputLine[7], (int)inputLine[11], (int)inputLine[15], (int)inputLine[19], (int)inputLine[23]);
+            processNewJob(newJob);
+        }
+        else if (inputLine.first == 'Q') {
+            //request for device(s) from job specified in inputLine
+            currentTime = (int)inputLine[3];
+            //find job with id == (int)inputLine[7];
+            //change the job's number of currently used devices like:
+            //jobWithID.addDevice((int)inputLine[11]);
+            freeDevices -= inputLine[11];
+        }
+        else if (intputLine.first == 'L') {
+            //release device(s) from job specified in inputLine
+            currentTime = (int)inputLine[3];
+            //find job with id == (int)inputLine[7];
+            //change the job's number of currently used devices like:
+            //jobWithID.releaseDevice((int)inputLine[11]);
+            freeDevices += inputLine[11];
+        }
+        else if (inputLine.first == 'D') {
+            int waitFor = (int)inputLine[3];
+            if (waitFor == 9999) {
+                //display the system turnaround and weighted turnaround time
+                cout<<""<<endl;
+            }
+            else if (currentTime == waitFor) {
+                //display system status
+                cout<<"The system currently looks like this:";
+                //list of each job
+                cout<<"";
+                //the remaining service time for unfinished jobs
+                cout<<"";
+                //the turnaround and weighted turnaround time for each finished job
+                cout<<"";
+                //the current contents of each of the queues
+                cout<<"";
+            }
+            else {
+                cout << "How'd we get here?";
+                cout << "waitFor value: " << waitFor;
+            }
+        }
+        else {
+            cout << "Job category not found for: " << inputLine;
+        }
     }
 
     void quantamStep(){
@@ -127,11 +128,7 @@ private:
             if(currentJob.isComplete()){
                 completeJob();
             }
-
         }
-
-
-
     }
 
     void completeJob(){

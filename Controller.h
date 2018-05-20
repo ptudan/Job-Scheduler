@@ -11,7 +11,7 @@ class Controler {
 public:
 	void readInputFile();
     int checkForRequest(int endQuantam);
-    void processLineOfInput();
+    void processLineOfInput(string inputLine);
     void quantamStep();
     void completeJob();
     void checkQueues();
@@ -21,7 +21,7 @@ public:
     void insertWaitQueue(Job newJob);
     void insertFIFOQueue(Job newJob);
     void insertSJFQueue(Job newJob);
-    
+
 private:
 	list<Job> SJFQueue;
 	list<Job> FIFOQueue;
