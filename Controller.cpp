@@ -13,6 +13,7 @@ private:
     list<Job> FIFOQueue;
     list<Job> readyQueue;
     list<Job> waitQueue;
+    list<Job> completedQueue;
     list<Job>::iterator it;
     int currentTime;
     int maxMemory;
@@ -78,16 +79,91 @@ private:
         Job completingJob = readyQueue.front();
         freeMemory += completingJob.getMemoryNeed();
         freeDevices += completingJob.getCurrentDevices();
-
+        readyQueue.pop_front();
+        completedQueue.push_back(completingJob);
+        checkQueues();
     }
 
     void checkQueues(){
-        //wait queue has a list of devices sorted in ascending order 
-        //of currentDevicesRequested
+        while(checkWaitQueue()){};
 
     }
 
-    void 
+    void waitToReady(){
+
+    }
+
+    bool checkWaitQueue(){
+        //10 total devices, reqJob has 1 currently. requesting 2, max 4
+        //readyQueue looks below, number is devicesStillNeeded and devices owned
+        //1 3 2 4
+        //3 0 1 1
+        if(waitQueue.empty()) return false;
+
+        Job reqJob = waitQueue.front();
+
+        if(reqJob.getCurrentRequest() > freeDevices) return false;
+        else if(readyQueue.empty()){
+            freeDevices -= reqJob.getCurrentRequest();
+            reqJob.grantRequest();
+            waitQueue.pop_front();
+            readyQueue.push_back(reqJob);
+            return true;
+        }
+        int needAfterReq = reqJob.getMaxDevices() - (reqJob.getCurrentDevices() + curReq);
+        int minNeed = 0; //minimum required devices of any process in the readyQueue
+        int maxNeed = 0; //maximum required devices of any process in the readyQueue
+        int totalRetrivableDevices = freeDevices - reqJob.getCurrentRequest();
+        int jobHit[readyQueue.size()+1];
+        while(true){
+            int counter = 0;
+            for(it = readyQueue.begin(); it!= readyQueue.end(); it++){
+                if(jobHit[counter]==1){ 
+                    counter++;
+                    continue;
+                }
+                
+                int jobNeed = it->getMaxDevices() - it->getCurrentDevices();
+                if(jobNeed <= totalRetrivableDevices){
+                    totalRetrivableDevices += it->getCurrentDevices();
+                    jobHit[counter] = 1;
+                }
+                else if(jobNeed < minNeed){
+                   minNeed = jobNeed;
+                }
+                else if(jobNeed > maxNeed){
+                    maxNeed = jobNeed;
+                }
+                counter++;
+            }
+            if(jobHit[readyQueue.size()]==0){
+                if(needAfterReq <= totalRetrivableDevices){
+                    totalRetrivableDevices += (reqJob.getCurrentRequest() + reqJob.getCurrentDevices());
+                }
+                else if(needAfterReq < minNeed){
+                    minNeed = needAfterReq;
+                }
+                else if(needAfterReq > maxNeed){
+                    maxNeed = needAfterReq;
+                }
+                jobHit[readyQueue.size()] = 1;
+            }
+            if(totalRetrivableDevices < minNeed){
+                //cout << "unable to move job "<< reqJob.getJobID() << " from wait queue to ready queue \n";
+                return false;
+            }
+            else if(totalRetrivableDevices >= maxNeed){
+                cout << "moving job "<< reqJob.getJobID() << " from wait queue to ready queue \n";
+                freeDevices -= reqJob.getCurrentRequest();
+                reqJob.grantRequest();
+                waitQueue.pop_front();
+                readyQueue.push_back(reqJob);
+                return true;
+            }
+
+        }
+
+    }
 
     void processNewJob(Job *newJob){
         if(*newJob.getMemoryNeed() > maxMemory) cout << "Job exceeds maximum memory capacity\n";
@@ -115,9 +191,7 @@ private:
             waitQueue.push_front(newJob);
             return;
         }
-
-        it = waitQueue.begin();
-        while(*it.getCurrentRequest() < newJob.getCurrentRequest() && it!=waitQueue.end()) it++;
+        while(it = waitQueue.begin(); *it.getCurrentRequest() < newJob.getCurrentRequest() && it!=waitQueue.end()) it++;
         waitQueue.insert_after(it, newJob);
     }
 
@@ -130,9 +204,7 @@ private:
             SJFQueue.push_front(newJob);
             return;
         }
-
-        it = SJFQueue.begin();
-        while(*it.getLength() < newJob.getLength() && it!=SJFQueue.end()) it++;
+        while(it = SJFQueue.begin(); *it.getLength() < newJob.getLength() && it!=SJFQueue.end()) it++;
         SJFQueue.insert_after(it, newJob);
     }
 }

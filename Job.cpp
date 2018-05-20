@@ -61,6 +61,10 @@ class Job{
 		return maxDevices;
 	}
 
+	int getJobID(){
+		return ID;
+	}
+
 	int getCurrentDevices(){
 		return currentDevices;
 	}
@@ -82,18 +86,9 @@ class Job{
 		return down;
 	}
 
-	int addDevice(int num){
-		int up;
-		if(currentDevices+num > maxDevices){
-			up = maxDevices - currentDevices;
-			currentDevices = maxDevices;
-		}
-		else{
-			currentDevices += num;
-			up = num;
-		}
-		return up;
-
+	void grantRequest(){
+		currentDevices += currentRequest;
+		currentRequest = 0;
 	}
 
 	void requestDevice(int num){
