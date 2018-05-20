@@ -128,6 +128,7 @@ private:
             currentTime += currentJob.step(quantam);
             if(currentJob.isComplete()){
                 completeJob();
+                checkQueues();
             }
         }
     }
@@ -136,10 +137,9 @@ private:
         //do we need completed queue for logs?
         Job completingJob = readyQueue.front();
         freeMemory += completingJob.getMemoryNeed();
-        freeDevices += completingJob.getCurrentDevices();
+        freeDevices += completingJob.releaseDevice(completingJob.getCurrentDevices());
         readyQueue.pop_front();
         completedQueue.push_back(completingJob);
-        checkQueues();
     }
 
     void checkQueues(){
@@ -148,24 +148,21 @@ private:
     }
 
     void waitToReady(){
-
+        Job reqJob = waitQueue.front();
+        freeDevices -= reqJob.getCurrentRequest();
+        reqJob.grantRequest();
+        cout << "moving job "<< reqJob.getJobID() << " from wait queue to ready queue \n";
+        waitQueue.pop_front();
+        readyQueue.push_back(reqJob);
     }
 
     bool checkWaitQueue(){
-        //10 total devices, reqJob has 1 currently. requesting 2, max 4
-        //readyQueue looks below, number is devicesStillNeeded and devices owned
-        //1 3 2 4
-        //3 0 1 1
         if(waitQueue.empty()) return false;
-
         Job reqJob = waitQueue.front();
 
         if(reqJob.getCurrentRequest() > freeDevices) return false;
         else if(readyQueue.empty()){
-            freeDevices -= reqJob.getCurrentRequest();
-            reqJob.grantRequest();
-            waitQueue.pop_front();
-            readyQueue.push_back(reqJob);
+            waitToReady();
             return true;
         }
         int needAfterReq = reqJob.getMaxDevices() - (reqJob.getCurrentDevices() + curReq);
@@ -186,36 +183,26 @@ private:
                     totalRetrivableDevices += it->getCurrentDevices();
                     jobHit[counter] = 1;
                 }
-                else if(jobNeed < minNeed){
-                   minNeed = jobNeed;
-                }
-                else if(jobNeed > maxNeed){
-                    maxNeed = jobNeed;
-                }
+                else if(jobNeed < minNeed) minNeed = jobNeed;
+                else if(jobNeed > maxNeed) maxNeed = jobNeed;
                 counter++;
             }
+
             if(jobHit[readyQueue.size()]==0){
                 if(needAfterReq <= totalRetrivableDevices){
                     totalRetrivableDevices += (reqJob.getCurrentRequest() + reqJob.getCurrentDevices());
+                    jobHit[readyQueue.size()] = 1;
                 }
-                else if(needAfterReq < minNeed){
-                    minNeed = needAfterReq;
-                }
-                else if(needAfterReq > maxNeed){
-                    maxNeed = needAfterReq;
-                }
-                jobHit[readyQueue.size()] = 1;
+                else if(needAfterReq < minNeed) minNeed = needAfterReq;
+                else if(needAfterReq > maxNeed) maxNeed = needAfterReq;
             }
+
             if(totalRetrivableDevices < minNeed){
                 //cout << "unable to move job "<< reqJob.getJobID() << " from wait queue to ready queue \n";
                 return false;
             }
             else if(totalRetrivableDevices >= maxNeed){
-                cout << "moving job "<< reqJob.getJobID() << " from wait queue to ready queue \n";
-                freeDevices -= reqJob.getCurrentRequest();
-                reqJob.grantRequest();
-                waitQueue.pop_front();
-                readyQueue.push_back(reqJob);
+                waitToReady();
                 return true;
             }
 
