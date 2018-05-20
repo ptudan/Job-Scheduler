@@ -30,7 +30,7 @@ class Job{
 	}
 
 	String currentStatus(){
-
+		
 	}
 
 	bool isComplete(){
