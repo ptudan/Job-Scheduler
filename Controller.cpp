@@ -63,9 +63,34 @@ private:
                 }
                 else if (oneLineString.first == 'L') {
                     //release device(s) from job specified in oneLineString
+                    currentTime = (int)oneLineString[3];
+                    //find job with id == (int)oneLineString[7];
+                    //change the job's number of currently used devices like:
+                    //jobWithID.releaseDevice((int)oneLineString[11]);
+                    freeDevices += oneLineString[11];
                 }
                 else if (oneLineString.first == 'D') {
-                    //display system status
+                    int waitFor = (int)oneLineString[3];
+                    if (waitFor == 9999) {
+                        //display the system turnaround and weighted turnaround time
+                        cout<<""<<endl;
+                    }
+                    else if (currentTime == waitFor) {
+                        //display system status
+                        cout<<"The system currently looks like this:"<<endl;
+                        //list of each job
+                        cout<<""<<endl;
+                        //the remaining service time for unfinished jobs
+                        cout<<""<<endl;
+                        //the turnaround and weighted turnaround time for each finished job
+                        cout<<""<<endl;
+                        //the current contents of each of the queues
+                        cout<<""<<endl;
+                    }
+                    else {
+                        cout<<"How'd we get here?"<<endl;
+                        cout<<"waitFor value: ", waitFor<<endl;
+                    }
                 }
                 else {
                     cout<<"Job category not found for: ", oneLineString<<endl;

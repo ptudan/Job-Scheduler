@@ -29,6 +29,10 @@ class Job{
 		progress = 0;
 	}
 
+	String currentStatus(){
+		
+	}
+
 	bool isComplete(){
 		return progress >= length;
 	}
