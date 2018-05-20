@@ -52,6 +52,7 @@ private:
                     //job intialization with these spesifications:
                     //int arrivalTime, int ID, int memoryNeed, int maxDevices, int priority, int length
                     Job newJob((int)oneLineString[3], (int)oneLineString[7], (int)oneLineString[11], (int)oneLineString[15], (int)oneLineString[19], (int)oneLineString[23]);
+                    processNewJob(newJob);
                 }
                 else if (oneLineString.first == 'Q') {
                     //request for device(s) from job specified in oneLineString
@@ -102,7 +103,7 @@ private:
         }
     }
 
-    int checkForRequest(endQuantam){
+    int checkForRequest(int endQuantam){
         //TODO
         //return an int for the number of requested devices
         //for release it could be a negative number
@@ -146,8 +147,6 @@ private:
         //of currentDevicesRequested
 
     }
-
-    void 
 
     void processNewJob(Job *newJob){
         if(*newJob.getMemoryNeed() > maxMemory) cout << "Job exceeds maximum memory capacity\n";

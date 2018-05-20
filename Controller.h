@@ -10,6 +10,18 @@ using namespace std;
 class Controler {
 public:
 	void readInputFile();
+    int checkForRequest(int endQuantam);
+    void processLineOfInput();
+    void quantamStep();
+    void completeJob();
+    void checkQueues();
+    void checkQueues();
+    void processNewJob(Job *newJob);
+    void insertReadyQueue(Job newJob);
+    void insertWaitQueue(Job newJob);
+    void insertFIFOQueue(Job newJob);
+    void insertSJFQueue(Job newJob);
+    
 private:
 	list<Job> SJFQueue;
 	list<Job> FIFOQueue;

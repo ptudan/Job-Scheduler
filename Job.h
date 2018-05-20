@@ -8,11 +8,16 @@ class Job{
 public:
 	void initiate(int arrivalTime, int ID, int memoryNeed, int maxDevices, int priority, int length);
 	String currentStatus();
+	bool isComplete();
 	void step(int quantam);
+	int getMemoryNeed();
+	int getLength();
+	int getMaxDevices();
+	int getCurrentDevices();
+	int getCurrentRequest();
 	void releaseDevice(int num);
 	void addDevice(int num);
 	int requestDevice(int num);
-	int getMemoryNeed();
 
 private:
 	int currentRequest;
