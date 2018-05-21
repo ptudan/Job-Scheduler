@@ -129,12 +129,12 @@ private:
             if(currentJob.isComplete()){
                 completeJob();
                 checkQueues();
+                return;
             }
         }
     }
 
     void completeJob(){
-        //do we need completed queue for logs?
         Job completingJob = readyQueue.front();
         freeMemory += completingJob.getMemoryNeed();
         freeDevices += completingJob.releaseDevice(completingJob.getCurrentDevices());
@@ -144,10 +144,14 @@ private:
 
     void checkQueues(){
         while(checkWaitQueue()){};
+        while(checkSJFQueue()){};
+        while(checkFIFOQueue()){};
 
     }
 
     void waitToReady(){
+        //moves the object from the front of the wait queue to the back 
+        //of the ready queue, updates devices
         Job reqJob = waitQueue.front();
         freeDevices -= reqJob.getCurrentRequest();
         reqJob.grantRequest();
@@ -156,7 +160,37 @@ private:
         readyQueue.push_back(reqJob);
     }
 
+    bool checkFIFOQueue(){
+        //returns true if an element is moved from FIFO queue to ready queue, false if not
+        if(FIFOQueue.empty()) return false;
+        Job moveJob = FIFOQueue.begin();
+        if(moveJob.getMemoryNeed() <= freeMemory){
+            freeMemory -= moveJob.getMemoryNeed();
+            FIFOQueue.pop_front();
+            readyQueue.push_back(moveJob);
+            return true;
+        }
+        return false;
+    }
+
+    bool checkSJFQueue(){
+        //returns true if an element is moved from SJF queue to ready queue, false if not
+        if(SJFQueue.empty()) return false;
+        Job moveJob = SJFQueue.begin();
+        if(moveJob.getMemoryNeed() <= freeMemory){
+            freeMemory -= moveJob.getMemoryNeed();
+            SJFQueue.pop_front();
+            readyQueue.push_back(moveJob);
+            return true;
+        }
+        return false;
+    }
+
     bool checkWaitQueue(){
+        //-returns true if an element is moved from wait queue to ready queue, false if not
+        //-should be called after a job completes
+        //-will perform bankers algorithm based on the currentRequest of the job at the
+        //front of the wait queue
         if(waitQueue.empty()) return false;
         Job reqJob = waitQueue.front();
 
@@ -198,7 +232,6 @@ private:
             }
 
             if(totalRetrivableDevices < minNeed){
-                //cout << "unable to move job "<< reqJob.getJobID() << " from wait queue to ready queue \n";
                 return false;
             }
             else if(totalRetrivableDevices >= maxNeed){
@@ -212,8 +245,9 @@ private:
     void processNewJob(Job *newJob){
         if(*newJob.getMemoryNeed() > maxMemory) cout << "Job exceeds maximum memory capacity\n";
         else if(*newJob.getMaxDevices() > maxDevices) cout << "Job exceeds maximum device capacity\n";
-        else if(*newJob.getMemoryNeed() < freeMemory) insertReadyQueue(*newJob);
-        else if( )
+        else if(*newJob.getMemoryNeed() <= freeMemory) insertReadyQueue(*newJob);
+        else if(*newJob.getPriority() == 1) insertSJFQueue(*newJob);
+        else insertFIFOQueue(*newJob);
 
     }
 

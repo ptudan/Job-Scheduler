@@ -57,6 +57,10 @@ class Job{
 		return length;
 	}
 
+	int getPriority(){
+		return priority;
+	}
+
 	int getMaxDevices(){
 		return maxDevices;
 	}
