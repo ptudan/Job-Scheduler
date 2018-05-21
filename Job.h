@@ -12,11 +12,13 @@ public:
 	void step(int quantam);
 	int getMemoryNeed();
 	int getLength();
+	int getPriority();
 	int getMaxDevices();
+	int getJobID();
 	int getCurrentDevices();
 	int getCurrentRequest();
 	void releaseDevice(int num);
-	void addDevice(int num);
+	void grantRequest();
 	int requestDevice(int num);
 
 private:

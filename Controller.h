@@ -21,6 +21,7 @@ public:
     void insertWaitQueue(Job newJob);
     void insertFIFOQueue(Job newJob);
     void insertSJFQueue(Job newJob);
+    Job findJobWithID(int id);
 
 private:
 	list<Job> SJFQueue;

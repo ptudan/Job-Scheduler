@@ -30,12 +30,12 @@ private:
         if (inputFile.is_open()) {
             while (!inputFile.eof) {
                 getline(inputFile, oneLineString);
-                cout<<"Single line input: "oneLineString<<endl;
+                cout << "Single line input: " oneLineString << endl;
                 processLineOfInput(string oneLineString);
             }
         }
         else {
-            cout << "Unable to open file";
+            cout << "Unable to open file" << endl;
         }
     }
 
@@ -74,19 +74,33 @@ private:
             processNewJob(newJob);
         }
         else if (inputLine.first == 'Q') {
+
             //request for device(s) from job specified in inputLine
             currentTime = (int)inputLine[3];
-            //find job with id == (int)inputLine[7];
-            //change the job's number of currently used devices like:
-            //jobWithID.addDevice((int)inputLine[11]);
+
+            //get job id
+            int jobID = (int)inputLine[7];
+
+            //find job with jobID
+            selectedJob = findJobWithID(jobID);
+
+            //change the job's number of currently used devices
+            selectedjob.requestDevice((int)inputLine[11]);
             freeDevices -= inputLine[11];
         }
         else if (intputLine.first == 'L') {
+
             //release device(s) from job specified in inputLine
             currentTime = (int)inputLine[3];
-            //find job with id == (int)inputLine[7];
-            //change the job's number of currently used devices like:
-            //jobWithID.releaseDevice((int)inputLine[11]);
+
+            //get job id
+            int jobID = (int)inputLine[7]
+
+            //find job with jobId
+            selectedJob = findJobWithID(jobID);
+
+            //release the job's current devices
+            selectedJob.releaseDevice((int)inputLine[11]);
             freeDevices += inputLine[11];
         }
         else if (inputLine.first == 'D') {
@@ -96,24 +110,50 @@ private:
                 cout<<""<<endl;
             }
             else if (currentTime == waitFor) {
+
                 //display system status
-                cout<<"The system currently looks like this:";
+                cout<<"The system currently looks like this: \n";
+
                 //list of each job
                 cout<<"";
+
                 //the remaining service time for unfinished jobs
-                cout<<"";
+                for (it = waitQueue.begin(); it != waitQueue.end(); ++it) {
+                    cout << "Job with id: " << waitQueue[it].getJobID() << " still has " << waitQueueue.getLength() << " service time left\n";
+                }
+
                 //the turnaround and weighted turnaround time for each finished job
                 cout<<"";
+
                 //the current contents of each of the queues
-                cout<<"";
+                cout << "The following jobs are in the SJFQueue: \n"
+                for (it = SJFQueue.begin(); it != SJFQueue.end(); ++it) {
+                    cout << "Job with id: " << JFSQueue[it].getJobID() << endl;
+                }
+                cout << "The following jobs are in the FIFOQueue: \n"
+                for (it = FIFOQueue.begin(); it != FIFOQueue.end(); ++it) {
+                    cout << "Job with id: " << FIFOQueue[it].getJobID() << endl;
+                }
+                cout << "The following jobs are in the readyQueue: \n"
+                for (it = readyQueue.begin(); it != readyQueue.end(); ++it) {
+                    cout << "Job with id: " << readyQueue[it].getJobID() << endl;
+                }
+                cout << "The following jobs are in the waitQueue: \n"
+                for (it = waitQueue.begin(); it != waitQueue.end(); ++it) {
+                    cout << "Job with id: " << waitQueue[it].getJobID() << endl;
+                }
+                cout << "The following jobs are in the completedQueue: \n"
+                for (it = completedQueue.begin(); it != completedQueue.end(); ++it) {
+                    cout << "Job with id: " << completedQueue[it].getJobID() << endl;
+                }
             }
             else {
-                cout << "How'd we get here?";
-                cout << "waitFor value: " << waitFor;
+                cout << "How'd we get here?\n";
+                cout << "waitFor value: " << waitFor << endl;
             }
         }
         else {
-            cout << "Job category not found for: " << inputLine;
+            cout << "Job category not found for: " << inputLine << endl;
         }
     }
 
@@ -284,5 +324,67 @@ private:
         }
         while(it = SJFQueue.begin(); *it.getLength() < newJob.getLength() && it!=SJFQueue.end()) it++;
         SJFQueue.insert_after(it, newJob);
+    }
+
+    Job findJobWithID(int id) {
+        //search queues
+        cout << "Searching for job with id: \n" << id;
+
+        //SJFQueue
+        for (it = SJFQueue.begin(); it != SJFQueue.end(); ++it) {
+            if (SJFQueue[it].getJobID() == id) {
+                cout << "Job with id " << id << " is in the SFJQueue\n";
+                return SJFQueue[it];
+            }
+            else {
+                cout << "Job with id " << id << " not found in SFJQueue\n";
+            }
+        }
+
+        //FIFOQueue
+        for (it = FIFOQueue.begin(); it != FIFOQueue.end(); ++it) {
+            if (FIFOQueue[it].getJobID() == id) {
+                cout << "Job with id " << id << " is in the FIFOQueue\n";
+                return FIFOQueue[it];
+            }
+            else {
+                cout << "Job with id " << id << " not found in FIFOQueue\n";
+            }
+        }
+
+        //readyQueue
+        for (it = readyQueue.begin(); it != readyQueue.end(); ++it) {
+            if (readyQueue[it].getJobID() == id) {
+                cout << "Job with id " << id << " is in the readyQueue\n";
+                return readyQueue[it];
+            }
+            else {
+                cout << "Job with id " << id << " not found in readyQueue\n";
+            }
+        }
+
+        //waitQueue
+        for (it = waitQueue.begin(); it != waitQueue.end(); ++it) {
+            if (waitQueue[it].getJobID() == id) {
+                cout << "Job with id " << id << " is in the waitQueue\n";
+                return waitQueue[it];
+            }
+            else {
+                cout << "Job with id " << id << " not found in waitQueue\n";
+            }
+        }
+
+        //completedQueue;
+        for (it = completeQueue.begin(); it != completeQueue.end(); ++it) {
+            if (completeQueue[it].getJobID() == id) {
+                cout << "Job with id " << id << " is in the completeQueue\n";
+                return completeQueue[it];
+            }
+            else {
+                cout << "Job with id " << id << " not found in completeQueue\n";
+            }
+        }
+        //maybe this should return a blank job
+        cout << "Job with id: " << id << " not found\n";
     }
 }
