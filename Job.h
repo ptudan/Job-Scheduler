@@ -20,6 +20,7 @@ public:
 	void releaseDevice(int num);
 	void grantRequest();
 	int requestDevice(int num);
+	int getTurnaroundTime();
 
 private:
 	int currentRequest;
