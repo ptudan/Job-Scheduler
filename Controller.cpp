@@ -115,7 +115,7 @@ private:
         }
     }
 
-    void processRequest(string inputLine){
+    bool processRequest(string inputLine){
         int ind = 2;
         int arrTime = getNextNum(inputLine.substr(ind));
         while(inputLine[ind]!='=') ind++;
@@ -132,7 +132,68 @@ private:
             cout<<"Device requested while not running on the cpu (or the readyQueue is broken)"<<endl;
             exit();
         }
+        else{
+            readyQueue.front().requestDevice(devReq);
+            return checkValidRequest();
+        }
 
+    }
+
+    bool checkValidRequest(){
+        Job reqJob = readyQueue.front();
+        if(readyQueue.size()== 1){
+            if(reqJob.getCurrentRequest() <= freeDevices){
+                freeDevices -= reqJob.getCurrentRequest();
+                reqJob.grantRequest();
+                return true;
+            }
+        }
+
+        if(reqJob.getCurrentRequest() > freeDevices) return false;
+
+
+        int needAfterReq = reqJob.getMaxDevices() - (reqJob.getCurrentDevices() + curReq);
+        int minNeed = 0; //minimum required devices of any process in the readyQueue
+        int maxNeed = 0; //maximum required devices of any process in the readyQueue
+        int totalRetrivableDevices = freeDevices - reqJob.getCurrentRequest();
+        int jobHit[readyQueue.size()];
+        while(true){
+            int counter = 1;
+            for(it = readyQueue.begin()+1; it!= readyQueue.end(); it++){
+                if(jobHit[counter]==1){ 
+                    counter++;
+                    continue;
+                }
+                
+                int jobNeed = it->getMaxDevices() - it->getCurrentDevices();
+                if(jobNeed <= totalRetrivableDevices){
+                    totalRetrivableDevices += it->getCurrentDevices();
+                    jobHit[counter] = 1;
+                }
+                else if(jobNeed < minNeed) minNeed = jobNeed;
+                else if(jobNeed > maxNeed) maxNeed = jobNeed;
+                counter++;
+            }
+
+            if(jobHit[0]==0){
+                if(needAfterReq <= totalRetrivableDevices){
+                    totalRetrivableDevices += (reqJob.getCurrentRequest() + reqJob.getCurrentDevices());
+                    jobHit[0] = 1;
+                }
+                else if(needAfterReq < minNeed) minNeed = needAfterReq;
+                else if(needAfterReq > maxNeed) maxNeed = needAfterReq;
+            }
+
+            if(totalRetrivableDevices < minNeed){
+                return false;
+            }
+            else if(totalRetrivableDevices >= maxNeed){
+                freeDevices -= reqJob.getCurrentRequest();
+                reqJob.grantRequest();
+                return true;
+            }
+
+        }
 
     }
 
