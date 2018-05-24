@@ -24,10 +24,12 @@ private:
     int nextRequest;
     int startTime;
 
-	void readInputFile() {
-        string testOutputSting
+    void readInputFile() {
+        string testOutputSting;
         ofstream inputFile;
         inputFile.open('input.txt');
+        getline(inputFile, oneLineString);
+        initalizeController(oneLineString);
         if (inputFile.is_open()) {
             while (!inputFile.eof) {
                 getline(inputFile, oneLineString);
@@ -47,9 +49,7 @@ private:
         //one function for update instead of release and requrest?
     }
 
-    void processLineOfInput(string inputLine){
-        //call the functions basically
-        //update the nextRequest variable so that you can do quantams
+    void initializeController(string inputLine){
         if (inputLine.first == 'C') {
             //initiate system with the following configuration from inputLine:
 
@@ -69,13 +69,78 @@ private:
             quantumTime = (int)inputLine.last;
 
         }
-        else if (inputLine.first == 'A') {
-            //job intialization with these spesifications:
-            //int arrivalTime, int ID, int memoryNeed, int maxDevices, int priority, int length
-            Job newJob((int)inputLine[3], (int)inputLine[7], (int)inputLine[11], (int)inputLine[15], (int)inputLine[19], (int)inputLine[23]);
-            processNewJob(newJob);
+        else cout <<"incorrectly attempted to initializeController\n";
+    }
+
+    int getNextNum(string inputLine){
+        string temp = "";
+        int counter = 0;
+        while(inputLine[counter]!= ' '){
+            temp = temp + inputLine[counter];
+            counter++;
         }
-        else if (inputLine.first == 'Q') {
+        return stoi(temp); 
+    }
+
+
+    void newJobInput(string inputLine){
+        void processLineOfInput(string inputLine){
+            int ind = 2;
+
+            int arrTime = getNextNum(inputLine.substr(ind));
+            while(inputLine[ind]!='=') ind++;
+            ind++;
+
+            int jobNum = getNextNum(inputLine.substr(ind));
+            while(inputLine[ind]!='=') ind++;
+            ind++;
+
+            int memReq = getNextNum(inputLine.substr(ind));
+            while(inputLine[ind]!='=') ind++;
+            ind++;
+
+            int maxDev = getNextNum(inputLine.substr(ind));
+            while(inputLine[ind]!='=') ind++;
+            ind++;
+            
+            int runTime = getNextNum(inputLine.substr(ind));
+            while(inputLine[ind]!='=') ind++;
+            ind++;
+
+            int prior = getNextNum(inputLine.substr(ind));
+
+            //cout<<"arrival time " <<arrTime << " jobNum "<<jobNum<<" memReq "<<memReq<<" maxDev "<<maxDev<<" runtime " <<runTime<< " priority "<<prior<<endl;
+            processNewJob(Job(arrTime, jobNum, memReq, maxDev, runTime, prior));
+
+        }
+    }
+
+    void processRequest(string inputLine){
+        int ind = 2;
+        int arrTime = getNextNum(inputLine.substr(ind));
+        while(inputLine[ind]!='=') ind++;
+        ind++;
+        int jobNum = getNextNum(inputLine.substr(ind));
+        while(inputLine[ind]!='=') ind++;
+        ind++;
+        int devReq = getNextNum(inputLine.substr(ind));
+        if(arrTime != currentTime){
+            cout<< "attempted to request devices out of time, arrivalTime of request was "<< arrTime<< " and current time is "<<currentTime<<endl;
+            exit();
+        }
+        else if(readyQueue.front().getJobID != jobNum){
+            cout<<"Device requested while not running on the cpu (or the readyQueue is broken)"<<endl;
+            exit();
+        }
+
+
+    }
+
+    void processLineOfInput(string inputLine){
+        //call the functions basically
+        //update the nextRequest variable so that you can do quantams
+
+        if (inputLine.first == 'Q') {
 
             //request for device(s) from job specified in inputLine
             currentTime = (int)inputLine[3];
@@ -96,7 +161,7 @@ private:
             currentTime = (int)inputLine[3];
 
             //get job id
-            int jobID = (int)inputLine[7]
+            int jobID = (int)inputLine[7];
 
             //find job with jobId
             selectedJob = findJobWithID(jobID);
@@ -181,7 +246,7 @@ private:
             }
         }
         else{
-            
+
         }
 
     }

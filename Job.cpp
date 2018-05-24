@@ -29,7 +29,7 @@ class Job{
 		progress = 0;
 	}
 
-	String currentStatus(){
+	string currentStatus(){
 		
 	}
 
