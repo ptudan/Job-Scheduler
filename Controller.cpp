@@ -169,9 +169,16 @@ private:
             if(currentJob.isComplete()){
                 completeJob();
                 checkQueues();
-                return;
+            }
+            else{
+                readyQueue.pop_front();
+                readyQueue.push_back(currentJob);
             }
         }
+        else{
+            
+        }
+
     }
 
     void completeJob(){
