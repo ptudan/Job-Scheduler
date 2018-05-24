@@ -34,5 +34,6 @@ private:
     int maxDevices;
     int freeDevices;
     int quantumTime;
+    int startTime;
     list<Job>::iterator it;
 }

@@ -22,6 +22,7 @@ private:
     int freeDevices;
     int quantumTime;
     int nextRequest;
+    int startTime;
 
 	void readInputFile() {
         string testOutputSting
@@ -52,7 +53,8 @@ private:
         if (inputLine.first == 'C') {
             //initiate system with the following configuration from inputLine:
 
-            //start time
+            //start time to calculate the turnaround time and weighted turnaround time
+            startTime = (int)inputLine[2];
             currentTime = (int)inputLine[2];
 
             //main memory capacity and current free memory capacity
@@ -107,15 +109,16 @@ private:
             int waitFor = (int)inputLine[3];
             if (waitFor == 9999) {
                 //display the system turnaround and weighted turnaround time
-                cout<<""<<endl;
+                cout << "The system turnaround time is" << currentTime - startTime << endl;
             }
             else if (currentTime == waitFor) {
 
                 //display system status
-                cout<<"The system currently looks like this: \n";
+                cout << "The system currently looks like this: \n";
+                cout << "\n";
 
                 //list of each job
-                cout<<"";
+                cout << "";
 
                 //the remaining service time for unfinished jobs
                 for (it = waitQueue.begin(); it != waitQueue.end(); ++it) {
@@ -123,7 +126,9 @@ private:
                 }
 
                 //the turnaround and weighted turnaround time for each finished job
-                cout<<"";
+                for (it = completedQueue.begin(); it != completedQueue.end(); ++it) {
+                    cout << "Job with id: " << completedQueue[it].getJobID() << "had a turnaround time of: " << completedQueue[it].getTurnaroundTime() << endl;
+                }
 
                 //the current contents of each of the queues
                 cout << "The following jobs are in the SJFQueue: \n"
@@ -148,7 +153,7 @@ private:
                 }
             }
             else {
-                cout << "How'd we get here?\n";
+                cout << "Uhh ohh how'd we get here?\n";
                 cout << "waitFor value: " << waitFor << endl;
             }
         }
@@ -302,13 +307,11 @@ private:
         if(newJob.getMemoryNeed() > freeMemory){
             cout << "not enough mem to insert job into RQ\n";
             exit();
-
         }
         else{
             freeMemory -= newJob.getMemoryNeed();
             readyQueue.push_back(newJob);
         }
-
     }
 
     void insertWaitQueue(Job newJob){

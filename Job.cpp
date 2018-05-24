@@ -104,4 +104,8 @@ class Job{
 			currentRequest +=num;
 		}
 	}
+
+	int getTurnaroundTime () {
+		return arrivalTime  - completionTime;
+	}
 }
