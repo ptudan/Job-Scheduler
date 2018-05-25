@@ -520,4 +520,83 @@ private:
         //maybe this should return a blank job
         cout << "Job with id: " << id << " not found\n";
     }
+    
+    void outputCurrentSystem () {
+
+        Json::Value event;   
+        Json::Value vec(Json::arrayValue);
+        vec.append(Json::Value(1));
+        vec.append(Json::Value(2));
+        vec.append(Json::Value(3));
+
+        event["system"]["current time"]= currentTime;
+        event["system"]["total_memory"]= maxMemory;
+        event["system"]["free_memory"]= freeMemory;
+        event["system"]["total_devices"]= maxDevices;
+        event["system"]["free_devices"]= freeDevices;
+        event["system"]["quantum"]= quantumTime;
+        event["system"]["turnaround_time"]= currentTime - startTime;
+        event["system"]["weighted_time"]= currentTime - startTime - length;
+        event["system"]["running"]= currentTime;
+        event["system"]["readyq"]["quques"]= readyQueue.length();
+        event["system"]["submitq"]["quques"]= submitQueue.length();
+        event["system"]["holdq_2"]["quques"]= SJFQueue.length();
+        event["system"]["holdq_1"]["quques"]= FIFOQueue.length();
+        event["system"]["completeq"["quques"]]= completeQueue.length();
+
+        //the remaining service time for unfinished jobs
+        for (it = waitQueue.begin(); it != waitQueue.end(); ++it) {
+            event["system"]["jobs"]["arrival_time"]= waitQueue.arrivalTime;
+            event["system"]["jobs"]["devices_allocated"]= waitQueue.currentDevices;
+            event["system"]["jobs"]["id"]= waitQueue.id;
+            event["system"]["jobs"]["remaining_time"]= waitQueue.length + waitQueue.arrivalTime - waitQueue.currentTime;
+        }
+
+        //the turnaround and weighted turnaround time for each finished job
+        for (it = readydQueue.begin(); it != readyQueue.end(); ++it) {
+            event["system"]["jobs"]["arrival_time"]= readyQueue.arrivalTime;
+            event["system"]["jobs"]["devices_allocated"]= readyQueue.currentDevices;
+            event["system"]["jobs"]["id"]= readyQueue.id;
+            event["system"]["jobs"]["remaining_time"]= readyQueue.length + readyQueue.arrivalTime - readyQueue.currentTime;
+        }
+
+        //the current contents of each of the queues
+        for (it = SJFQueue.begin(); it != SJFQueue.end(); ++it) {
+            event["system"]["jobs"]["arrival_time"]= SJFQueue.arrivalTime;
+            event["system"]["jobs"]["devices_allocated"]= SJFQueue.currentDevices;
+            event["system"]["jobs"]["id"]= SJFQueue.id;
+            event["system"]["jobs"]["remaining_time"]= SJFQueue.length + SJFQueue.arrivalTime - SJFQueue.currentTime;
+        }
+
+        for (it = FIFOQueue.begin(); it != FIFOQueue.end(); ++it) {
+            event["system"]["jobs"]["arrival_time"]= FIFOQueue.arrivalTime;
+            event["system"]["jobs"]["devices_allocated"]= FIFOQueue.currentDevices;
+            event["system"]["jobs"]["id"]= FIFOQueue.id;
+            event["system"]["jobs"]["remaining_time"]= FIFOQueue.length + FIFOQueue.arrivalTime - FIFOQueue.currentTime;
+        }
+
+        for (it = readyQueue.begin(); it != readyQueue.end(); ++it) {
+            event["system"]["jobs"]["arrival_time"]= readyQueue.arrivalTime;
+            event["system"]["jobs"]["devices_allocated"]= readyQueue.currentDevices;
+            event["system"]["jobs"]["id"]= readyQueue.id;
+            event["system"]["jobs"]["remaining_time"]= readyQueue.length + readyQueue.arrivalTime - readuQueue.currentTime;
+        }
+        
+        for (it = waitQueue.begin(); it != waitQueue.end(); ++it) {
+            event["system"]["jobs"]["arrival_time"]= waitQueue.arrivalTime;
+            event["system"]["jobs"]["devices_allocated"]= waitQueue.currentDevices;
+            event["system"]["jobs"]["id"]= waitQueue.id;
+            event["system"]["jobs"]["remaining_time"]= waitQueue.length + waitQueue.arrivalTime - waitQueue.currentTime;
+        }
+
+        for (it = completedQueue.begin(); it != completedQueue.end(); ++it) {
+            event["system"]["jobs"]["arrival_time"]= completedQueue.arrivalTime;
+            event["system"]["jobs"]["completion_time"]= completedQueue.completionTime;
+            event["system"]["jobs"]["id"]= completedQueue.id;
+            event["system"]["jobs"]["remaining_time"]= completedQueue.length + completedQueue.arrivalTime - completedQueue.currentTime;
+        }
+
+        std::cout << event << std::endl;
+
+    }
 }
