@@ -1,3 +1,5 @@
+//Paul Tudan and Jefferson Kappers
+#pragma once
 #include "Job.h"
 #include "Controller.h"
 #include <list>

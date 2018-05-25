@@ -1,18 +1,15 @@
 //Paul Tudan and Jefferson Kappers
 //5-9-18
-
-#include <Job.h>
-
+#pragma once
+#include "Job.h"
 #include <list>
 #include <string>
 using namespace std;
 
-class Controler {
+class Controller {
 public:
-	Controller controller(string filename);
+	Controller(string filename);
 	void start();
-
-private:
 	void initializeController(string inputLine);
 	int getNextNum(string inputLine);
 	void processNewJob(string inputLine);
@@ -21,7 +18,7 @@ private:
 	bool checkValidRequest();
 	void processLineOfInput(string inputLine);
 	void printStuff(string inputLine);
-	void quantamStep();
+	void quantumStep();
 	void completeJob();
 	void checkQueues();
 	void waitToReady();
@@ -33,14 +30,15 @@ private:
 	void insertWaitQueue(Job *newJob);
 	void insertFIFOQueue(Job *newJob);
 	void insertSJFQueue(Job *newJob);
-	Job findJobWithID(int id);
+	void findJobWithID(int id);
+	void outputCurrentSystem();
 	string nameOfFile;
     list<Job*> SJFQueue;
     list<Job*> FIFOQueue;
     list<Job*> readyQueue;
     list<Job*> waitQueue;
     list<Job*> completedQueue;
-    list<Job>::iterator it;
+    list<Job*>::iterator it;
     int currentTime;
     int maxMemory;
     int freeMemory;
@@ -49,4 +47,4 @@ private:
     int quantumTime;
     int nextInput;
     int startTime;
-}
+};

@@ -1,11 +1,11 @@
 //Paul Tudan and Jefferson Kappers
 //5-9-18
-
+#pragma once
 #include <string>
 using namespace std;
 
 class Job{
-public:
+	public:
 	Job(int arrivalTime, int ID, int memoryNeed, int maxDevices, int priority, int length);
 	string currentStatus();
 	bool isComplete();
@@ -22,9 +22,6 @@ public:
 	void grantRequest();
 	void requestDevice(int num);
 	int getTurnaroundTime ();
-
-
-private:
 	int arrivalTime;
 	int completionTime;
 	int ID;
@@ -36,4 +33,4 @@ private:
 	int length;
 	int progress;
 
-}
+};
