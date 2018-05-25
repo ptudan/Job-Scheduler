@@ -6,10 +6,11 @@ using namespace std;
 
 class Job{
 public:
-	void initiate(int arrivalTime, int ID, int memoryNeed, int maxDevices, int priority, int length);
-	String currentStatus();
+	Job(int arrivalTime, int ID, int memoryNeed, int maxDevices, int priority, int length);
+	string currentStatus();
 	bool isComplete();
-	void step(int quantam);
+	void complete(int ct);
+	int step(int quantam);
 	int getMemoryNeed();
 	int getLength();
 	int getPriority();
@@ -17,19 +18,20 @@ public:
 	int getJobID();
 	int getCurrentDevices();
 	int getCurrentRequest();
-	void releaseDevice(int num);
+	int releaseDevice(int num);
 	void grantRequest();
-	int requestDevice(int num);
-	int getTurnaroundTime();
+	void requestDevice(int num);
+	int getTurnaroundTime ();
+
 
 private:
-	int currentRequest;
 	int arrivalTime;
 	int completionTime;
 	int ID;
 	int memoryNeed;
 	int maxDevices;
 	int currentDevices;
+	int currentRequest;
 	int priority;
 	int length;
 	int progress;

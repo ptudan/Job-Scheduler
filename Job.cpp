@@ -17,7 +17,7 @@ class Job{
 	int length;
 	int progress;
 
-	void initiate(int arrivalTime, int ID, int memoryNeed, int maxDevices, int priority, int length){
+	Job(int arrivalTime, int ID, int memoryNeed, int maxDevices, int priority, int length){
 		this->arrivalTime = arrivalTime;
 		this->ID  = ID;
 		this->memoryNeed = memoryNeed;
@@ -27,6 +27,7 @@ class Job{
 		currentRequest = 0;
 		currentDevices = 0;
 		progress = 0;
+		completionTime = -1;
 	}
 
 	string currentStatus(){
@@ -35,6 +36,10 @@ class Job{
 
 	bool isComplete(){
 		return progress >= length;
+	}
+
+	void complete(int ct){
+		completionTime = ct;
 	}
 
 	int step(int quantam){
