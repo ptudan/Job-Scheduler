@@ -5,19 +5,9 @@
 #include <iostream>
 using namespace std;
 
-class Job{
-	int arrivalTime;
-	int completionTime;
-	int ID;
-	int memoryNeed;
-	int maxDevices;
-	int currentDevices;
-	int currentRequest;
-	int priority;
-	int length;
-	int progress;
 
-	Job(int arrivalTime, int ID, int memoryNeed, int maxDevices, int priority, int length){
+
+	Job::Job(int arrivalTime, int ID, int memoryNeed, int maxDevices, int priority, int length){
 		this->arrivalTime = arrivalTime;
 		this->ID  = ID;
 		this->memoryNeed = memoryNeed;
@@ -30,19 +20,19 @@ class Job{
 		completionTime = -1;
 	}
 
-	string currentStatus(){
+	string Job::currentStatus(){
 		
 	}
 
-	bool isComplete(){
+	bool Job::isComplete(){
 		return progress >= length;
 	}
 
-	void complete(int ct){
+	void Job::complete(int ct){
 		completionTime = ct;
 	}
 
-	int step(int quantam){
+	int Job::step(int quantam){
 		if(progress+quantam>length){
 			int ret = length - progress;
 			progress = length;
@@ -54,35 +44,35 @@ class Job{
 
 
 
-	int getMemoryNeed(){
+	int Job::getMemoryNeed(){
 		return memoryNeed;
 	}
 
-	int getLength(){
+	int Job::getLength(){
 		return length;
 	}
 
-	int getPriority(){
+	int Job::getPriority(){
 		return priority;
 	}
 
-	int getMaxDevices(){
+	int Job::getMaxDevices(){
 		return maxDevices;
 	}
 
-	int getJobID(){
+	int Job::getJobID(){
 		return ID;
 	}
 
-	int getCurrentDevices(){
+	int Job::getCurrentDevices(){
 		return currentDevices;
 	}
 
-	int getCurrentRequest(){
+	int Job::getCurrentRequest(){
 		return currentRequest;
 	}
 
-	int releaseDevice(int num){
+	int Job::releaseDevice(int num){
 		int down;
 		if(currentDevices-num < 0){
 			down = currentDevices;
@@ -95,12 +85,12 @@ class Job{
 		return down;
 	}
 
-	void grantRequest(){
+	void Job::grantRequest(){
 		currentDevices += currentRequest;
 		currentRequest = 0;
 	}
 
-	void requestDevice(int num){
+	void Job::requestDevice(int num){
 		int req;
 		if(num + currentRequest > maxDevices - currentDevices){
 			currentRequest = maxDevices -(currentDevices);
@@ -110,7 +100,7 @@ class Job{
 		}
 	}
 
-	int getTurnaroundTime () {
+	int Job::getTurnaroundTime () {
 		return arrivalTime  - completionTime;
 	}
-}
+};

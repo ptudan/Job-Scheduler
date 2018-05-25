@@ -1,8 +1,8 @@
 //Paul Tudan and Jefferson Kappers
 //5-11-18
 
-#include <Job.h>
-#include <Controller.h>
+#include "Job.h"
+#include "Controller.h"
 #include <list>
 #include <string>
 #include <iostream>
@@ -11,214 +11,201 @@
 using namespace std;
 
 
-class Controller {
-private:
-    list<Job*> SJFQueue;
-    list<Job*> FIFOQueue;
-    list<Job*> readyQueue;
-    list<Job*> waitQueue;
-    list<Job*> completedQueue;
-    list<Job>::iterator it;
-    int currentTime;
-    int maxMemory;
-    int freeMemory;
-    int maxDevices;
-    int freeDevices;
-    int quantumTime;
-    int nextInput;
-    int startTime;
+Controller::Controller(string filename){
+    nameOfFile = filename;
+}
 
-    void readInputFile() {
-        string testOutputSting;
-        ifstream inputFile;
-        inputFile.open("input.txt");
-        getline(inputFile, oneLineString);
-        initalizeController(oneLineString);
-        getline(inputFile, oneLineString);
-        nextInput = getNextNum(oneLineString.substr(2));
-        if (inputFile.is_open()) {
-            while (inputFile.good() && currentTime < 9999) {
+void Controller::start() {
+    string testOutputSting;
+    ifstream inputFile;
+    inputFile.open(nameOfFile);
+    getline(inputFile, oneLineString);
+    initalizeController(oneLineString);
+    getline(inputFile, oneLineString);
+    nextInput = getNextNum(oneLineString.substr(2));
+    if (inputFile.is_open()) {
+        while (inputFile.good() && currentTime < 9999) {
 
-                if(readyQueue.empty()){
-                    currentTime = nextInput;
-                    processLineOfInput(string oneLineString);
-                }
-                else if(currentTime + quantum < nextInput){
-                    quantumStep();
-                }
-                else{
-                    endQuantum = currentTime + quantum;
-                    list<string> externalEvents;
-                    while((oneLineString[0] == 'A' || oneLineString[0] == 'D') && nextInput<=endQuantum){
-                        currentTime = nextInput;
-                        externalEvents.push_back(oneLineString);
-                        if(inputFile.good()){
-                            getline(inputFile, oneLineString);
-                            nextInput = getNextNum(oneLineString.substr(2));
-                        }
-                    }
-                    if(oneLineString[0]=='Q' && nextInput <=endQuantum){
-                        currentTime = nextInput;
-                        processRequest(oneLineString);
-                        if(inputFile.good()){
-                            getline(inputFile, oneLineString);
-                            nextInput = getNextNum(oneLineString.substr(2));
-                        }
-                    }
-                    else if(oneLineString[0]=='L' && nextInput<=endQuantum){
-                        currentTime = nextInput;
-                        processRelease(oneLineString);
-                        if(inputFile.good()){
-                            getline(inputFile, oneLineString);
-                            nextInput = getNextNum(oneLineString.substr(2));
-                        }
-                    }
-
-                    while(!externalEvents.empty()){
-                        processLineOfInput(externalEvents.front());
-                        externalEvents.pop_front();
-                    }
-                }
-
-                getline(inputFile, oneLineString);
-                nextInput = getNextNum(oneLineString.substr(2));
+            if(readyQueue.empty()){
+                currentTime = nextInput;
+                processLineOfInput(string oneLineString);
             }
-            while(!readyQueue.empty() && currentTime < 9999) quantumStep();
+            else if(currentTime + quantum < nextInput){
+                quantumStep();
+            }
+            else{
+                endQuantum = currentTime + quantum;
+                list<string> externalEvents;
+                while((oneLineString[0] == 'A' || oneLineString[0] == 'D') && nextInput<=endQuantum){
+                    currentTime = nextInput;
+                    externalEvents.push_back(oneLineString);
+                    if(inputFile.good()){
+                        getline(inputFile, oneLineString);
+                        nextInput = getNextNum(oneLineString.substr(2));
+                    }
+                }
+                if(oneLineString[0]=='Q' && nextInput <=endQuantum){
+                    currentTime = nextInput;
+                    processRequest(oneLineString);
+                    if(inputFile.good()){
+                        getline(inputFile, oneLineString);
+                        nextInput = getNextNum(oneLineString.substr(2));
+                    }
+                }
+                else if(oneLineString[0]=='L' && nextInput<=endQuantum){
+                    currentTime = nextInput;
+                    processRelease(oneLineString);
+                    if(inputFile.good()){
+                        getline(inputFile, oneLineString);
+                        nextInput = getNextNum(oneLineString.substr(2));
+                    }
+                }
+
+                while(!externalEvents.empty()){
+                    processLineOfInput(externalEvents.front());
+                    externalEvents.pop_front();
+                }
+            }
+
+            getline(inputFile, oneLineString);
+            nextInput = getNextNum(oneLineString.substr(2));
         }
-        else {
-            cout << "Unable to open file" << endl;
-        }
+        while(!readyQueue.empty() && currentTime < 9999) quantumStep();
     }
-
-    void initializeController(string inputLine){
-        if (inputLine.first == 'C') {
-            int ind = 2;
-            startTime = getNextNum(inputLine);
-            while(inputLine[ind]!='=') ind++;
-            ind++;
-            maxMemory = getNextNum(inputLine);
-            while(inputLine[ind]!='=') ind++;
-            ind++;
-            maxDevices = getNextNum(inputLine);
-            while(inputLine[ind]!='=') ind++;
-            ind++;
-            quantumTime = = getNextNum(inputLine);
-        }
-        else cout <<"incorrectly attempted to initializeController\n";
+    else {
+        cout << "Unable to open file" << endl;
     }
+}
 
-    int getNextNum(string inputLine){
-        string temp = "";
-        int counter = 0;
-        while(inputLine[counter]!= ' '){
-            temp = temp + inputLine[counter];
-            counter++;
-        }
-        return stoi(temp); 
-    }
-
-
-    void processNewJob(string inputLine){
+void Controller::initializeController(string inputLine){
+    if (inputLine.first == 'C') {
         int ind = 2;
-
-        int arrTime = getNextNum(inputLine.substr(ind));
+        startTime = getNextNum(inputLine);
         while(inputLine[ind]!='=') ind++;
         ind++;
-
-        int jobNum = getNextNum(inputLine.substr(ind));
+        maxMemory = getNextNum(inputLine);
         while(inputLine[ind]!='=') ind++;
         ind++;
-
-        int memReq = getNextNum(inputLine.substr(ind));
+        maxDevices = getNextNum(inputLine);
         while(inputLine[ind]!='=') ind++;
         ind++;
+        quantumTime = = getNextNum(inputLine);
+    }
+    else cout <<"incorrectly attempted to initializeController\n";
+}
 
-        int maxDev = getNextNum(inputLine.substr(ind));
-        while(inputLine[ind]!='=') ind++;
-        ind++;
-        
-        int runTime = getNextNum(inputLine.substr(ind));
-        while(inputLine[ind]!='=') ind++;
-        ind++;
+int gController::etNextNum(string inputLine){
+    string temp = "";
+    int counter = 0;
+    while(inputLine[counter]!= ' '){
+        temp = temp + inputLine[counter];
+        counter++;
+    }
+    return stoi(temp); 
+}
 
-        int prior = getNextNum(inputLine.substr(ind));
+
+void Controller::processNewJob(string inputLine){
+    int ind = 2;
+
+    int arrTime = getNextNum(inputLine.substr(ind));
+    while(inputLine[ind]!='=') ind++;
+    ind++;
+
+    int jobNum = getNextNum(inputLine.substr(ind));
+    while(inputLine[ind]!='=') ind++;
+    ind++;
+
+    int memReq = getNextNum(inputLine.substr(ind));
+    while(inputLine[ind]!='=') ind++;
+    ind++;
+
+    int maxDev = getNextNum(inputLine.substr(ind));
+    while(inputLine[ind]!='=') ind++;
+    ind++;
+
+    int runTime = getNextNum(inputLine.substr(ind));
+    while(inputLine[ind]!='=') ind++;
+    ind++;
+
+    int prior = getNextNum(inputLine.substr(ind));
 
         //cout<<"arrival time " <<arrTime << " jobNum "<<jobNum<<" memReq "<<memReq<<" maxDev "<<maxDev<<" runtime " <<runTime<< " priority "<<prior<<endl;
-        insertNewJob(new Job(arrTime, jobNum, memReq, maxDev, runTime, prior));
+    insertNewJob(new Job(arrTime, jobNum, memReq, maxDev, runTime, prior));
 
+}
+
+void Controller::processRelease(string inputLine){
+    int ind = 2;
+    int arrTime = getNextNum(inputLine.substr(ind));
+    while(inputLine[ind]!='=') ind++;
+    ind++;
+    int jobNum = getNextNum(inputLine.substr(ind));
+    while(inputLine[ind]!='=') ind++;
+    ind++;
+    int relReq = getNextNum(inputLine.substr(ind));
+    if(arrTime != currentTime){
+        cout<< "attempted to release devices out of time, arrivalTime of request was "<< arrTime<< " and current time is "<<currentTime<<endl;
+        exit();
     }
-
-    void processRelease(string inputLine){
-        int ind = 2;
-        int arrTime = getNextNum(inputLine.substr(ind));
-        while(inputLine[ind]!='=') ind++;
-        ind++;
-        int jobNum = getNextNum(inputLine.substr(ind));
-        while(inputLine[ind]!='=') ind++;
-        ind++;
-        int relReq = getNextNum(inputLine.substr(ind));
-        if(arrTime != currentTime){
-            cout<< "attempted to release devices out of time, arrivalTime of request was "<< arrTime<< " and current time is "<<currentTime<<endl;
-            exit();
-        }
-        else if(readyQueue.front()->getJobID != jobNum){
-            cout<<"Device requested for release while not running on the cpu (or the readyQueue is broken)"<<endl;
-            exit();
-        }
-        else if(readyQueue.front()->getCurrentDevices() < relReq){
-            cout<<"attempted to release too many devices"<<endl;
-            exit();            
-        }
-        else{
-            Job* relJob = readyQueue.front();
-            freeDevices += relJob->releaseDevice(relReq);
-            readyQueue.pop_front();
-            readyQueue.push_back(relJob);
-            while(checkWaitQueue()){};
-        }
+    else if(readyQueue.front()->getJobID != jobNum){
+        cout<<"Device requested for release while not running on the cpu (or the readyQueue is broken)"<<endl;
+        exit();
     }
-
-    void processRequest(string inputLine){
-        int ind = 2;
-        int arrTime = getNextNum(inputLine.substr(ind));
-        while(inputLine[ind]!='=') ind++;
-        ind++;
-        int jobNum = getNextNum(inputLine.substr(ind));
-        while(inputLine[ind]!='=') ind++;
-        ind++;
-        int devReq = getNextNum(inputLine.substr(ind));
-        if(arrTime != currentTime){
-            cout<< "attempted to request devices out of time, arrivalTime of request was "<< arrTime<< " and current time is "<<currentTime<<endl;
-            exit();
-        }
-        else if(readyQueue.front()->getJobID != jobNum){
-            cout<<"Device requested while not running on the cpu (or the readyQueue is broken)"<<endl;
-            exit();
-        }
-        else{
-            Job* reqJob = readyQueue.front();
-            reqJob->requestDevice(devReq);
-            readyQueue.pop_front();
-            if(checkValidRequest()) readyQueue.push_back(reqJob);
-            else insertWaitQueue(reqJob);
-        }
-
+    else if(readyQueue.front()->getCurrentDevices() < relReq){
+        cout<<"attempted to release too many devices"<<endl;
+        exit();            
     }
+    else{
+        Job* relJob = readyQueue.front();
+        freeDevices += relJob->releaseDevice(relReq);
+        readyQueue.pop_front();
+        readyQueue.push_back(relJob);
+        while(checkWaitQueue()){};
+    }
+}
 
-    bool checkValidRequest(){
+void Controller::processRequest(string inputLine){
+    int ind = 2;
+    int arrTime = getNextNum(inputLine.substr(ind));
+    while(inputLine[ind]!='=') ind++;
+    ind++;
+    int jobNum = getNextNum(inputLine.substr(ind));
+    while(inputLine[ind]!='=') ind++;
+    ind++;
+    int devReq = getNextNum(inputLine.substr(ind));
+    if(arrTime != currentTime){
+        cout<< "attempted to request devices out of time, arrivalTime of request was "<< arrTime<< " and current time is "<<currentTime<<endl;
+        exit();
+    }
+    else if(readyQueue.front()->getJobID != jobNum){
+        cout<<"Device requested while not running on the cpu (or the readyQueue is broken)"<<endl;
+        exit();
+    }
+    else{
         Job* reqJob = readyQueue.front();
-        if(readyQueue.size()== 1){
-            if(reqJob->getCurrentRequest() <= freeDevices){
-                freeDevices -= reqJob->getCurrentRequest();
-                reqJob->grantRequest();
-                return true;
-            }
+        reqJob->requestDevice(devReq);
+        readyQueue.pop_front();
+        if(checkValidRequest()) readyQueue.push_back(reqJob);
+        else insertWaitQueue(reqJob);
+    }
+
+}
+
+bool Controller::checkValidRequest(){
+    Job* reqJob = readyQueue.front();
+    if(readyQueue.size()== 1){
+        if(reqJob->getCurrentRequest() <= freeDevices){
+            freeDevices -= reqJob->getCurrentRequest();
+            reqJob->grantRequest();
+            return true;
         }
+    }
 
-        if(reqJob.getCurrentRequest() > freeDevices) return false;
+    if(reqJob.getCurrentRequest() > freeDevices) return false;
 
 
-        int needAfterReq = reqJob->getMaxDevices() - (reqJob->getCurrentDevices() + curReq);
+    int needAfterReq = reqJob->getMaxDevices() - (reqJob->getCurrentDevices() + curReq);
         int minNeed = 0; //minimum required devices of any process in the readyQueue
         int maxNeed = 0; //maximum required devices of any process in the readyQueue
         int totalRetrivableDevices = freeDevices - reqJob->getCurrentRequest();
@@ -267,7 +254,7 @@ private:
 
     }
 
-    void processLineOfInput(string inputLine){
+    void Controller::processLineOfInput(string inputLine){
         //call the functions basically
         //update the nextInput variable so that you can do quantams
 
@@ -287,11 +274,11 @@ private:
         }
     }
 
-    void printStuff(string inputLine){
+    void Controller::printStuff(string inputLine){
         cout<<"jeff pls"<<endl;
     }   
 
-    void quantamStep(){
+    void Controller::quantamStep(){
         Job* currentJob = readyQueue.front();
         currentTime += currentJob->step(quantam);
         if(currentJob->isComplete()){
@@ -305,7 +292,7 @@ private:
 
     }
 
-    void completeJob(){
+    void Controller::completeJob(){
         Job* completingJob = readyQueue.front();
         freeMemory += completingJob->getMemoryNeed();
         freeDevices += completingJob->releaseDevice(completingJob->getCurrentDevices());
@@ -314,14 +301,14 @@ private:
         completedQueue.push_back(completingJob);
     }
 
-    void checkQueues(){
+    void Controller::checkQueues(){
         while(checkWaitQueue()){};
         while(checkSJFQueue()){};
         while(checkFIFOQueue()){};
 
     }
 
-    void waitToReady(){
+    void Controller::waitToReady(){
         //moves the object from the front of the wait queue to the back 
         //of the ready queue, updates devices
         Job* reqJob = waitQueue.front();
@@ -332,7 +319,7 @@ private:
         readyQueue.push_back(reqJob);
     }
 
-    bool checkFIFOQueue(){
+    bool Controller::checkFIFOQueue(){
         //returns true if an element is moved from FIFO queue to ready queue, false if not
         if(FIFOQueue.empty()) return false;
         Job* moveJob = FIFOQueue.begin();
@@ -345,7 +332,7 @@ private:
         return false;
     }
 
-    bool checkSJFQueue(){
+    bool Controller::checkSJFQueue(){
         //returns true if an element is moved from SJF queue to ready queue, false if not
         if(SJFQueue.empty()) return false;
         Job* moveJob = SJFQueue.begin();
@@ -358,7 +345,7 @@ private:
         return false;
     }
 
-    bool checkWaitQueue(){
+    bool Controller::checkWaitQueue(){
         //-returns true if an element is moved from wait queue to ready queue, false if not
         //-should be called after a job completes
         //-will perform bankers algorithm based on the currentRequest of the job at the
@@ -417,7 +404,7 @@ private:
         return false;
 
     }
-    void insertNewJob(Job *newJob){
+    void Controller::insertNewJob(Job *newJob){
         if(newJob->getMemoryNeed() > maxMemory) cout << "Job exceeds maximum memory capacity\n";
         else if(newJob->getMaxDevices() > maxDevices) cout << "Job exceeds maximum device capacity\n";
         else if(newJob->getMemoryNeed() <= freeMemory) insertReadyQueue(newJob);
@@ -426,7 +413,7 @@ private:
 
     }
 
-    void insertReadyQueue(Job *newJob){
+    void Controller::insertReadyQueue(Job *newJob){
         if(newJob->getMemoryNeed() > freeMemory){
             cout << "not enough mem to insert job into RQ\n";
             exit();
@@ -437,7 +424,7 @@ private:
         }
     }
 
-    void insertWaitQueue(Job *newJob){
+    void Controller::insertWaitQueue(Job *newJob){
         if(waitQueue.empty()){
             waitQueue.push_front(newJob);
             return;
@@ -446,11 +433,11 @@ private:
         waitQueue.insert_after(it, newJob);
     }
 
-    void insertFIFOQueue(Job *newJob){
+    void Controller::insertFIFOQueue(Job *newJob){
         FIFOQueue.push_back(newJob);
     }
 
-    void insertSJFQueue(Job *newJob){
+    void Controller::insertSJFQueue(Job *newJob){
         if(SJFQueue.empty()){
             SJFQueue.push_front(newJob);
             return;
@@ -459,7 +446,7 @@ private:
         SJFQueue.insert_after(it, newJob);
     }
 
-    Job findJobWithID(int id) {
+    Job Controller::findJobWithID(int id) {
         //search queues
         cout << "Searching for job with id: \n" << id;
 
@@ -521,7 +508,7 @@ private:
         cout << "Job with id: " << id << " not found\n";
     }
     
-    void outputCurrentSystem () {
+    void Controller::outputCurrentSystem () {
 
         Json::Value event;   
         Json::Value vec(Json::arrayValue);
@@ -599,4 +586,3 @@ private:
         std::cout << event << std::endl;
 
     }
-}

@@ -9,7 +9,10 @@ using namespace std;
 
 class Controler {
 public:
-	void readInputFile();
+	Controller controller(string filename);
+	void start();
+
+private:
 	void initializeController(string inputLine);
 	int getNextNum(string inputLine);
 	void processNewJob(string inputLine);
@@ -31,8 +34,7 @@ public:
 	void insertFIFOQueue(Job *newJob);
 	void insertSJFQueue(Job *newJob);
 	Job findJobWithID(int id);
-
-private:
+	string nameOfFile;
     list<Job*> SJFQueue;
     list<Job*> FIFOQueue;
     list<Job*> readyQueue;

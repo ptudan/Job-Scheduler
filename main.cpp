@@ -1,13 +1,14 @@
-//Paul Tudan and Jefferson Kappers
-//CISC361 Project
-//5-9-18
-
+#include "Job.h"
+#include "Controller.h"
+#include <list>
+#include <string>
 #include <iostream>
 #include <fstream>
-#include <Controller>
+#include <cstdlib>
 using namespace std;
 
-int main(int argc, char **argv) {
-    Controller jobController
-    return 0
+int main(){
+	Controller c("input.txt");
+	c.start();
+	cout<<"did I really get here"<<endl;
 }
